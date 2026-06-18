@@ -1,0 +1,18 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/kol/Documents/Robotics/ros_ws/four_wheel_cad_bot/build/four_wheel_bot_description",
+        "/home/kol/Documents/Robots/ros_ws/four_wheel_cad_bot/install/four_wheel_bot_description/lib/python3.10/site-packages",
+        "/home/kol/Documents/Robotics/ros_ws/four_wheel_cad_bot/build/bot_control",
+        "/home/kol/Documents/Robots/ros_ws/four_wheel_cad_bot/install/bot_control/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/kol/Documents/Robotics/ros_ws/four_wheel_cad_bot/build/four_wheel_bot_description",
+        "/home/kol/Documents/Robots/ros_ws/four_wheel_cad_bot/install/four_wheel_bot_description/lib/python3.10/site-packages",
+        "/home/kol/Documents/Robotics/ros_ws/four_wheel_cad_bot/build/bot_control",
+        "/home/kol/Documents/Robots/ros_ws/four_wheel_cad_bot/install/bot_control/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}
