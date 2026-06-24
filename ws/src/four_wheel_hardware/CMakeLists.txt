@@ -13,6 +13,7 @@ find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 
+#four wheel ROS hardware
 add_library(
 	four_wheel_hardware	
 	SHARED
@@ -23,6 +24,30 @@ target_include_directories(
 	four_wheel_hardware	
 	PUBLIC
 	include
+)
+
+#arduino hardware
+add_library(
+	actual_hardware_interface
+	SHARED
+	src/actual_hardware_interface.cpp
+)
+
+
+target_include_directories(
+	actual_hardware_interface
+	PUBLIC
+	include
+)
+
+ament_target_dependencies(
+	actual_hardware_interface
+	rclcpp
+)
+
+target_link_libraries(
+	four_wheel_hardware
+	actual_hardware_interface
 )
 
 ament_target_dependencies(
@@ -59,6 +84,8 @@ install(
 	DESTINATION
 	share/${PROJECT_NAME}
 )
+
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
