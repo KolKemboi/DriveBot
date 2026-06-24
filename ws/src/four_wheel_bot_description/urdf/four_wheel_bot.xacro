@@ -4,6 +4,7 @@
 <xacro:include filename="$(find four_wheel_bot_description)/urdf/materials.xacro" />
 <xacro:include filename="$(find four_wheel_bot_description)/urdf/four_wheel_bot.trans" />
 <xacro:include filename="$(find four_wheel_bot_description)/urdf/ros2_control.xacro" />
+
 <link name="base_link">
   <inertial>
     <origin xyz="-0.0005245999930464274 -4.070305094087798e-16 0.03106777621116428" rpy="0 0 0"/>

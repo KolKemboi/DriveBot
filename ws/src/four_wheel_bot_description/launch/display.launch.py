@@ -56,7 +56,8 @@ def generate_launch_description():
         arguments=['-d', rviz_config_file],
         output='screen'
     )
-# -------------------------
+
+    # -------------------------
     controllers_file = os.path.join(
         share_dir,
         "config",
@@ -114,5 +115,5 @@ def generate_launch_description():
         delayed_diff_drive,
         # joint_state_publisher_node,
         # joint_state_publisher_gui_node,
-        rviz_node
+        # rviz_node
     ])
