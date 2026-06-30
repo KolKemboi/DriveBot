@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y \
     python3-numpy \
     python3-pyqt5 \
     python3-lxml \
-    tmux \
     ripgrep \
     fd-find \
     x11-apps \
@@ -45,16 +44,10 @@ RUN rosdep update
 
 # ---- MoveIt + ros2_control ----
 RUN apt-get update && apt-get install -y \
-    ros-jazzy-moveit \
-    ros-jazzy-moveit-visual-tools \
-    ros-jazzy-moveit-planners-ompl \
-    ros-jazzy-moveit-ros-control-interface \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
-		ros-jazzy-joint-state-publisher-gui \
     ros-jazzy-controller-manager \
     ros-jazzy-joint-state-broadcaster \
-    ros-jazzy-joint-trajectory-controller \
     && rm -rf /var/lib/apt/lists/*
 
 
