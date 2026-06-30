@@ -1,5 +1,4 @@
 #include "four_wheel_hardware/diffbot_hardware.hpp"
-#include "four_wheel_hardware/actual_hardware_interface.hpp"
 #include <cassert>
 #include <chrono>
 #include <hardware_interface/hardware_component_interface.hpp>
@@ -9,11 +8,9 @@
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <iomanip>
-#include <memory>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/utilities.hpp>
 #include <sstream>
-#include <string>
 
 // INFO: INIT
 namespace four_wheel_hardware {
@@ -30,17 +27,11 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
 
   this->hw_stop_sec_ = hardware_interface::stod(
       info_.hardware_parameters["hw_stop_duration_sec"]);
-
-  this->serial_port_ = info_.hardware_parameters["serial_port"];
-  this->baudrate_ = std::stoi(info_.hardware_parameters["baudrate"]);
-
   // TODO:
   // add wheel specific code, like a struct or something
   //
 
   RCLCPP_INFO(get_logger(), "ON_INIT-------------------------------");
-
-  this->arduino_ = std::make_unique<ArduinoInterface>();
 
   for (const hardware_interface::ComponentInfo &joint : info_.joints) {
     if (joint.command_interfaces.size() != 1) {
@@ -130,16 +121,11 @@ DiffBotSystemHardware::on_activate(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(),
               "ON_ACTIVATE--------------------------------------------------");
 
-  // for (int i = 0; i < this->hw_start_sec_; i++) {
-  //   rclcpp::sleep_for(std::chrono::seconds(1));
-  //   RCLCPP_INFO(get_logger(), "%.1f sec left..", hw_start_sec_ - i);
-  //   // TODO:
-  //   // add serial initialization to either /tty/ACM0 or /tty/USB0
-  // }
-
-  if (!this->arduino_->connect_f(this->serial_port_, this->baudrate_)) {
-    RCLCPP_ERROR(get_logger(), "FAILED TO CONNECT TO ARDUINO");
-    return hardware_interface::CallbackReturn::ERROR;
+  for (int i = 0; i < this->hw_start_sec_; i++) {
+    rclcpp::sleep_for(std::chrono::seconds(1));
+    RCLCPP_INFO(get_logger(), "%.1f sec left..", hw_start_sec_ - i);
+    // TODO:
+    // add serial initialization to either /tty/ACM0 or /tty/USB0
   }
 
   for (const auto &[name, descr] : joint_state_interfaces_) {
@@ -167,7 +153,12 @@ DiffBotSystemHardware::on_deactivate(const rclcpp_lifecycle::State &) {
     set_command(name, 0.0);
   }
 
-  this->arduino_->disconnect_f();
+  for (auto i = 0; i < hw_stop_sec_; i++) {
+    rclcpp::sleep_for(std::chrono::seconds(1));
+    RCLCPP_INFO(get_logger(), "%.1f seconds left...", hw_stop_sec_ - i);
+    // TODO:
+    // add serial closing logic
+  }
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -176,27 +167,28 @@ hardware_interface::return_type
 DiffBotSystemHardware::read(const rclcpp::Time &,
                             const rclcpp::Duration &period) {
 
-  double left_pos, left_vel;
-  double right_pos, right_vel;
+  std::stringstream ss;
+  ss << "READING STATUS";
+  ss << std::fixed << std::setprecision(2);
 
-  if (!this->arduino_->readFeedback_f(left_pos, left_vel, right_pos,
-                                      right_vel)) {
-    RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 2000,
-                         "FAILED READING ARDUINO");
+  for (const auto &[name, descr] : joint_state_interfaces_) {
+    if (descr.get_interface_name() == hardware_interface::HW_IF_POSITION) {
 
-    return hardware_interface::return_type::OK;
+      auto velocity = get_command(descr.get_prefix_name() + "/" +
+                                  hardware_interface::HW_IF_VELOCITY);
+
+      set_state(name, get_state(name) + period.seconds() * velocity);
+      // TODO:
+      // read from serial motor data for the state interfaces
+
+      ss << std::endl
+         << "\t position " << get_state(name) << " and velocity " << velocity
+         << " for '" << name << "'!";
+    }
   }
 
-  // set_state("front_left_joint/position", left_pos);
-  // set_state("back_left_joint/position", left_pos);
-  // set_state("front_left_joint/velocity", left_vel);
-  // set_state("back_left_joint/velocity", left_vel);
-  //
-  // set_state("front_right_joint/position", right_pos);
-  // set_state("back_right_joint/position", right_pos);
-  // set_state("front_right_joint/velocity", right_vel);
-  // set_state("back_right_joint/velocity", right_vel);
-  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 200, "UP");
+  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
+
   return hardware_interface::return_type::OK;
 }
 
@@ -204,15 +196,18 @@ DiffBotSystemHardware::read(const rclcpp::Time &,
 hardware_interface::return_type
 DiffBotSystemHardware::write(const rclcpp::Time &, const rclcpp::Duration &) {
 
-  double left_cmd = get_command("front_left_joint/velocity");
+  std::stringstream ss;
+  ss << "WRITING COMMANDS";
+  for (const auto &[name, descr] : joint_command_interfaces_) {
+    set_state(name, get_command(name));
+    // TODO:
+    // write from serial motor data for the command interfaces
 
-  double right_cmd = get_command("front_right_joint/velocity");
-
-  if (!arduino_->writeCommand_f(left_cmd, right_cmd)) {
-    RCLCPP_ERROR_THROTTLE(get_logger(), *get_clock(), 2000,
-                          "Failed writing to Arduino");
+    ss << std::fixed << std::setprecision(2) << std::endl
+       << "\t" << "command " << get_command(name) << " for '" << name << "'!";
   }
 
+  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
   return hardware_interface::return_type::OK;
 }
 

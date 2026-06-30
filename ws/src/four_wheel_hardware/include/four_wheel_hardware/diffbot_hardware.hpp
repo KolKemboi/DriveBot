@@ -1,5 +1,4 @@
 #pragma once
-#include "four_wheel_hardware/actual_hardware_interface.hpp"
 #include "hardware_interface/handle.hpp"
 #include <memory>
 #include <rclcpp/context.hpp>
@@ -37,7 +36,6 @@ public:
                                         const rclcpp::Duration &) override;
 
 private:
-	std::unique_ptr<ArduinoInterface> arduino_;
 
 	std::string serial_port_;
 	int baudrate_;
