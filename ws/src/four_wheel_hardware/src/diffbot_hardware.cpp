@@ -1,4 +1,5 @@
 #include "four_wheel_hardware/diffbot_hardware.hpp"
+#include "four_wheel_hardware/actual_hardware_interface.hpp"
 #include <cassert>
 #include <chrono>
 #include <hardware_interface/hardware_component_interface.hpp>
@@ -8,9 +9,11 @@
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <iomanip>
+#include <memory>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/utilities.hpp>
 #include <sstream>
+#include <string>
 
 // INFO: INIT
 namespace four_wheel_hardware {
@@ -27,11 +30,16 @@ hardware_interface::CallbackReturn DiffBotSystemHardware::on_init(
 
   this->hw_stop_sec_ = hardware_interface::stod(
       info_.hardware_parameters["hw_stop_duration_sec"]);
+
+  this->serial_port_ = info_.hardware_parameters["serial_port"];
+  this->baudrate_ = std::stoi(info_.hardware_parameters["baudrate"]);
+
   // TODO:
   // add wheel specific code, like a struct or something
   //
 
   RCLCPP_INFO(get_logger(), "ON_INIT-------------------------------");
+
 
   for (const hardware_interface::ComponentInfo &joint : info_.joints) {
     if (joint.command_interfaces.size() != 1) {
@@ -128,6 +136,7 @@ DiffBotSystemHardware::on_activate(const rclcpp_lifecycle::State &) {
     // add serial initialization to either /tty/ACM0 or /tty/USB0
   }
 
+
   for (const auto &[name, descr] : joint_state_interfaces_) {
     set_state(name, get_state(name));
     RCLCPP_INFO(get_logger(), "State Interface ---> %s", name.c_str());
@@ -153,12 +162,6 @@ DiffBotSystemHardware::on_deactivate(const rclcpp_lifecycle::State &) {
     set_command(name, 0.0);
   }
 
-  for (auto i = 0; i < hw_stop_sec_; i++) {
-    rclcpp::sleep_for(std::chrono::seconds(1));
-    RCLCPP_INFO(get_logger(), "%.1f seconds left...", hw_stop_sec_ - i);
-    // TODO:
-    // add serial closing logic
-  }
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -167,28 +170,7 @@ hardware_interface::return_type
 DiffBotSystemHardware::read(const rclcpp::Time &,
                             const rclcpp::Duration &period) {
 
-  std::stringstream ss;
-  ss << "READING STATUS";
-  ss << std::fixed << std::setprecision(2);
-
-  for (const auto &[name, descr] : joint_state_interfaces_) {
-    if (descr.get_interface_name() == hardware_interface::HW_IF_POSITION) {
-
-      auto velocity = get_command(descr.get_prefix_name() + "/" +
-                                  hardware_interface::HW_IF_VELOCITY);
-
-      set_state(name, get_state(name) + period.seconds() * velocity);
-      // TODO:
-      // read from serial motor data for the state interfaces
-
-      ss << std::endl
-         << "\t position " << get_state(name) << " and velocity " << velocity
-         << " for '" << name << "'!";
-    }
-  }
-
-  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
-
+  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 200, "UP");
   return hardware_interface::return_type::OK;
 }
 
@@ -196,18 +178,7 @@ DiffBotSystemHardware::read(const rclcpp::Time &,
 hardware_interface::return_type
 DiffBotSystemHardware::write(const rclcpp::Time &, const rclcpp::Duration &) {
 
-  std::stringstream ss;
-  ss << "WRITING COMMANDS";
-  for (const auto &[name, descr] : joint_command_interfaces_) {
-    set_state(name, get_command(name));
-    // TODO:
-    // write from serial motor data for the command interfaces
 
-    ss << std::fixed << std::setprecision(2) << std::endl
-       << "\t" << "command " << get_command(name) << " for '" << name << "'!";
-  }
-
-  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, "%s", ss.str().c_str());
   return hardware_interface::return_type::OK;
 }
 
