@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import tempfile
 import pybullet as p
 import pybullet_data
+
+import camera
+import robot_povs
+import cv2
 ## TODO: 
 # make this script communicate via serial
 # capture camera data -> for AI
@@ -77,55 +81,65 @@ def cont_rigth(velocity = 0):
             force = 20
             )
 
+robot_vision = camera.Camera()
+robot_pov = robot_povs.renderImages()
 while 1:
     p.stepSimulation()
-    cont_left(10)
-    cont_rigth()
 
     ## CAMERA
 
-    state = p.getLinkState(
-            robot,
-            CAMERA_SENSOR_JOINT,
-            computeForwardKinematics=True
-            )
-    cam_pos = state[4]
-    cam_orn = state[5]
+    base_pos, base_orn = p.getBasePositionAndOrientation(robot)
+    euler = p.getEulerFromQuaternion(base_orn)
+    base_z_rot = euler[2]
+    rot_matrix = np.array(p.getMatrixFromQuaternion(base_orn)).reshape(3, 3)
 
-    rot = p.getMatrixFromQuaternion(cam_orn)
-    forward = [rot[0], rot[3], rot[6]]
-    up = [rot[2], rot[5], rot[8]]
+    forward_image = robot_vision.forward(base_pos, base_orn)
+    back_image = robot_vision.backward(base_pos, base_orn)
+    left_image = robot_vision.left(base_pos, base_orn)
+    right_image = robot_vision.right(base_pos, base_orn)
+    # forward_image = forward_image.astype(np.uint8)
+    # robot_pov.grid(forward_image, back_image, left_image, right_image)
 
-    target = [
-            cam_pos[0] + forward[0],
-            cam_pos[1] + forward[1],
-            cam_pos[2] + forward[2],
-            ]
+    # state = p.getLinkState(
+    #         robot,
+    #         CAMERA_SENSOR_JOINT,
+    #         computeForwardKinematics=True
+    #         )
+    # cam_pos = state[4]
+    # cam_orn = state[5]
+    #
+    # rot = p.getMatrixFromQuaternion(cam_orn)
+    # forward = [rot[0], rot[3], rot[6]]
+    # up = [rot[2], rot[5], rot[8]]
+    #
+    # target = [
+    #         cam_pos[0] + forward[0],
+    #         cam_pos[1] + forward[1],
+    #         cam_pos[2] + forward[2],
+    #         ]
+    #
+    # view = p.computeViewMatrix(
+    #         cam_pos,
+    #         target,
+    #         up
+    #         )
+    #
+    # proj = p.computeProjectionMatrixFOV(
+    #         fov = 60,
+    #         aspect = 640/480,
+    #         nearVal = 0.01,
+    #         farVal = 20,
+    #         )
+    #
+    # w, h, rgb, depth, seg = p.getCameraImage(
+    #         640,
+    #         480,
+    #         view,
+    #         proj,
+    #         p.ER_BULLET_HARDWARE_OPENGL
+    #         )
 
-    view = p.computeViewMatrix(
-            cam_pos,
-            target,
-            up
-            )
-
-    proj = p.computeProjectionMatrixFOV(
-            fov = 60,
-            aspect = 640/480,
-            nearVal = 0.01,
-            farVal = 20,
-            )
-
-    w, h, rgb, depth, seg = p.getCameraImage(
-            640,
-            480,
-            view,
-            proj,
-            p.ER_BULLET_HARDWARE_OPENGL
-            )
-
-    rgb = np.reshape(rgb, (h, w, 4))
-    rgb = rgb[:, :, :3]
-    plt.imshow(rgb)
-    plt.show()
+    cont_left(10)
+    cont_rigth()
 
     time.sleep(1.0/240.)
