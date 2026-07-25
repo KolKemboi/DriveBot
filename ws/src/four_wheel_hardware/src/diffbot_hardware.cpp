@@ -176,26 +176,31 @@ hardware_interface::return_type
 DiffBotSystemHardware::read(const rclcpp::Time &,
                             const rclcpp::Duration &period) {
 
-  double left_pos, left_vel;
-  double right_pos, right_vel;
+  double left_vel, right_vel;
+  double dummy_left_pos, dummy_right_pos;
 
-  if (!this->arduino_->readFeedback_f(left_pos, left_vel, right_pos,
-                                      right_vel)) {
-    RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 2000,
-                         "FAILED READING ARDUINO");
-
+  if (!arduino_->readFeedback_f(dummy_left_pos, left_vel, dummy_right_pos,
+                                right_vel)) {
     return hardware_interface::return_type::OK;
   }
 
-  // set_state("front_left_joint/position", left_pos);
-  // set_state("back_left_joint/position", left_pos);
-  // set_state("front_left_joint/velocity", left_vel);
-  // set_state("back_left_joint/velocity", left_vel);
-  //
-  // set_state("front_right_joint/position", right_pos);
-  // set_state("back_right_joint/position", right_pos);
-  // set_state("front_right_joint/velocity", right_vel);
-  // set_state("back_right_joint/velocity", right_vel);
+  double dt = period.seconds();
+
+  left_pos_ += left_vel * dt;
+  right_pos_ += right_vel * dt;
+
+  set_state("front_left_joint/position", left_pos_);
+  set_state("back_left_joint/position", left_pos_);
+
+  set_state("front_left_joint/velocity", left_vel);
+  set_state("back_left_joint/velocity", left_vel);
+
+  set_state("front_right_joint/position", right_pos_);
+  set_state("back_right_joint/position", right_pos_);
+
+  set_state("front_right_joint/velocity", right_vel);
+  set_state("back_right_joint/velocity", right_vel);
+
   RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 200, "UP");
   return hardware_interface::return_type::OK;
 }

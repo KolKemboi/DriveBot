@@ -1,46 +1,41 @@
-float left_position = 1.25;
-  float left_velocity = 0.42;
-  float right_position = 1.24;
-  float right_velocity = 0.41;
+
+
+float left_vel = 0.0f;
+float right_vel = 0.0f;
+
+unsigned long last_time = 0;
 
 void setup() {
   Serial.begin(115200);
-// Example values (replace with your encoder readings)
-  
-  // Wait for the serial port (useful on boards with native USB)
-  while (!Serial) {
-  }
+
+  while (!Serial) {}
+
+  last_time = millis();
 }
 
 void loop() {
-  
-if (Serial.available())
-{
+  // Read latest command if available
+  if (Serial.available()) {
     String line = Serial.readStringUntil('\n');
 
-    float left;
-    float right;
+    int comma = line.indexOf(',');
 
-    if (sscanf(line.c_str(), "%f,%f",
-               &left, &right) == 2)
-    {
-        // Drive motors
+    if (comma != -1) {
+      left_vel = line.substring(0, comma).toFloat();
+      right_vel = line.substring(comma + 1).toFloat();
     }
-}
-  Serial.print(left_position);
-Serial.print(",");
+  }
 
-Serial.print(left_velocity);
-Serial.print(",");
+float left_position = 0.0f;
+float right_position = 0.0f;
+  // Send feedback
+  Serial.print(left_position, 3);
+  Serial.print(",");
+  Serial.print(left_vel, 3);
+  Serial.print(",");
+  Serial.print(right_position, 3);
+  Serial.print(",");
+  Serial.println(right_vel, 3);
 
-Serial.print(right_position);
-Serial.print(",");
-
-Serial.println(right_velocity);
-
-  delay(20);   // 50 Hz
-  left_position += 1;
-  left_velocity += 1;
-  right_position += 1;
-  right_velocity += 1;
+  delay(20);
 }
