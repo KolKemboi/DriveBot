@@ -1,10 +1,6 @@
 <?xml version="1.0" ?>
 <robot name="four_wheel_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:include filename="$(find four_wheel_bot_description)/urdf/materials.xacro" />
-<xacro:include filename="$(find four_wheel_bot_description)/urdf/four_wheel_bot.trans" />
-<xacro:include filename="$(find four_wheel_bot_description)/urdf/ros2_control.xacro" />
-
 <link name="base_link">
   <inertial>
     <origin xyz="-0.0005245999930464274 -4.070305094087798e-16 0.03106777621116428" rpy="0 0 0"/>
@@ -14,14 +10,13 @@
   <visual>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -35,14 +30,13 @@
   <visual>
     <origin xyz="-0.04 -0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/left_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/left_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="-0.04 -0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/left_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/left_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -56,14 +50,13 @@
   <visual>
     <origin xyz="0.04 -0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/left_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/left_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="0.04 -0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/left_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/left_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -77,14 +70,13 @@
   <visual>
     <origin xyz="-0.04 0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/right_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/right_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="-0.04 0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/right_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/right_front_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -98,14 +90,13 @@
   <visual>
     <origin xyz="0.04 0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/right_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/right_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="0.04 0.035 -0.015" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/right_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/right_back_wheel_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -119,14 +110,13 @@
   <visual>
     <origin xyz="-0.051 -0.0 -0.025" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/camera_sensor_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/camera_sensor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="-0.051 -0.0 -0.025" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/camera_sensor_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/camera_sensor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
@@ -140,14 +130,13 @@
   <visual>
     <origin xyz="-0.0 -0.0 -0.055" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/lidar_sensor_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/lidar_sensor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
-    <material name="silver"/>
   </visual>
   <collision>
     <origin xyz="-0.0 -0.0 -0.055" rpy="0 0 0"/>
     <geometry>
-      <mesh filename="file://$(find four_wheel_bot_description)/meshes/lidar_sensor_1.stl" scale="0.001 0.001 0.001"/>
+      <mesh filename="meshes/lidar_sensor_1.stl" scale="0.001 0.001 0.001"/>
     </geometry>
   </collision>
 </link>
